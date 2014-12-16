@@ -1,11 +1,10 @@
-angular.module("ng-objectstore",[])
-.factory("ObjectStore", function() {
-	function ObjectStore(url) {
+(function() {
+	function RasDB(url) {
 		if(url && typeof url==="string") this.url = arguments[0];
 		if(typeof arguments[0]==="object") this.OBJECTSTORE = arguments[0] || [];
 	}
 	
-	ObjectStore.prototype = {
+	RasDB.prototype = {
 		
 		add : function(object) {
 			this.OBJECTSTORE.push(object);
@@ -45,5 +44,5 @@ angular.module("ng-objectstore",[])
 			})
 		}
 	}
-	return ObjectStore;
-})
+	return RasDB;
+})();
