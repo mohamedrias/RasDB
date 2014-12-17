@@ -1,4 +1,4 @@
-(function() {
+(function(window, document, LS) {
 	/*
 		Constructor function to initialize the RAS DB object.
 	 */
@@ -6,11 +6,17 @@
 		this.configObject = configObject;
 		this.OBJECTSTORE = [];
 		this.CacheStore = {};
-		this.cache = configObject.cache;
-		this.index = configObject.index;
-		return this;
+		this.namespace = this.configObject && this.configObject.namespace;
+		//TODO: Get localstorage namespace from configObject
+		if(this.namespace) {
+			this.OBJECTSTORE = this.readFromLS();
+		}
+//		this.cache = configObject.cache || false;
+//		this.index = configObject.index || false;
+//		return this;
 	}
-	
+
+
 	RasDB.prototype = {
 
 		/*
@@ -35,25 +41,36 @@
 			if(data && typeof data === "object" && Object.prototype.toString.call(data) === "[object Object]") {
 				this.add(data);
 			}
+			this.writeToLS();
 			return this;
 		},
 		add : function(object) {
 			this.OBJECTSTORE.push(object);
+			this.writeToLS();
 			return this;
 		},
-	
-		delete : function(object) {
-			return this.OBJECTSTORE.map(function(obj, index) {
-				if(obj===object) return this.OBJECTSTORE.splice(index, 1)
-			})
+
+		//TODO: Need to update logic for delete functionality
+		delete : function(query) {
+			var self = this;
+			var matches = this.find(query);
+			console.log("matches "+matches);
+			if(this.isArray(matches)) {
+				matches.map(function(obj) {
+					return delete obj;
+				})
+			}
+			else {
+				self.OBJECTSTORE.splice(self.OBJECTSTORE.indexOf(matches),1);
+			}
 		},
-		
-		update : function(object){
-			return this.OBJECTSTORE.map(function(obj, index) {
-				if(obj===object) return obj=object;
-			});
+		isArray : function(obj) {
+			return Object.prototype.toString.call(obj)==="[object Array]";
 		},
-	
+		update : function(query, object){
+			return this.find(query)[0]=object;
+		},
+
 		getAll : function(){
 			return this.OBJECTSTORE;
 		},
@@ -89,13 +106,15 @@
 			}, [])
 		},
 
-
+		/*
+		//TODO: Logic to fix find by single property & value
 		findBy : function(property, value){
-			return this.OBJECTSTORE.reduce(function(obj, index) {
-				if(obj[property]==value) return obj;
+			return this.OBJECTSTORE.filter(function(obj) {
+				return (obj[property]==value);
 			})
 		},
-		
+
+		*/
 		findById : function(id){
 			return this.OBJECTSTORE.reduce(function(obj) {
 				if(obj.id==id) return obj;
@@ -109,6 +128,16 @@
 			this.OBJECTSTORE.map(function(obj) {
 				this.CacheStore[obj[self.index]] = obj;
 			})
+		},
+
+		writeToLS : function() {
+			localStorage[this.namespace] = JSON.stringify(this.OBJECTSTORE);
+		},
+
+		readFromLS : function() {
+			return localStorage[this.namespace]? JSON.parse(localStorage[this.namespace]) : [];
 		}
+
+
 	}
-})();
+})(window, document, localStorage);
