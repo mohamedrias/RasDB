@@ -78,8 +78,17 @@
 			return this.find(query)[0]=object;
 		},
 
-		getAll : function(){
-			return this.OBJECTSTORE;
+		get : function(param){
+			console.log(param+ " params");
+			console.log(typeof param=="number");
+			if(typeof param == "number") {
+				if(param < this.OBJECTSTORE.length) return this.OBJECTSTORE[param];
+				else {
+					console.warn("Sorry, index out of bound");
+					return;
+				}
+			}
+			else return this.OBJECTSTORE;
 		},
 
 		/*
@@ -87,13 +96,14 @@
 			If all the properties match, return the objects list
 		 */
 		find : function(object){
+			if(!object) return RasDB(this.OBJECTSTORE);
 			var keys = Object.keys(object);
-			return this.OBJECTSTORE.filter(function(obj) {
+			return RasDB(this.OBJECTSTORE.filter(function(obj) {
 				return keys.reduce(function(matching, key) {
 					if(obj[key]!=object[key]) matching = false;
 					return matching;
 				}, true);
-			})
+			}));
 		},
 
 		/*
@@ -103,14 +113,14 @@
 		//TODO: Need to check the logic still
 		findOr : function(object){
 			var keys = Object.keys(object);
-			return this.OBJECTSTORE.reduce(function(array, obj) {
+			return RasDB(this.OBJECTSTORE.reduce(function(array, obj) {
 				keys.map(function(key) {
 					if(obj[key]==object[key]) {
 						if(array.indexOf(obj)==-1) array.push(obj);
 					}
 				});
 				return array;
-			}, [])
+			}, []));
 		},
 
 		/*
@@ -123,9 +133,9 @@
 
 		*/
 		findById : function(id){
-			return this.OBJECTSTORE.reduce(function(obj) {
+			return RasDB(this.OBJECTSTORE.reduce(function(obj) {
 				if(obj.id==id) return obj;
-			})
+			}))
 		},
 		index : function(property) {
 			this.index = property;
@@ -138,15 +148,21 @@
 		},
 
 		limit : function(param) {
-			return this.OBJECTSTORE.slice(0,param);
+			return RasDB(this.OBJECTSTORE.slice(0,param));
 		},
 
 		skip: function(param) {
-			return this.OBJECTSTORE.slice(param);
+			return RasDB(this.OBJECTSTORE.slice(param));
 		},
 
 		range: function(from, to) {
-			return this.OBJECTSTORE.slice(from,to);
+			return RasDB(this.OBJECTSTORE.slice(from,to));
+		},
+
+		exec : function(callback) {
+			if(callback && typeof callback =="function") {
+				return callback.apply(this, this.get());
+			}
 		},
 
 		writeToLS : function() {
