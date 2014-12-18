@@ -3,6 +3,13 @@
 		Constructor function to initialize the RAS DB object.
 	 */
 	window.RasDB = function(configObject) {
+		if(!(this instanceof RasDB)) {
+			return new RasDB(configObject);
+		}
+		if({}.toString.call(configObject)=="[object Array]") {
+			this.OBJECTSTORE = configObject;
+			return this;
+		}
 		this.configObject = configObject;
 		this.OBJECTSTORE = [];
 		this.CacheStore = {};
