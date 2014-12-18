@@ -61,7 +61,6 @@
 		delete : function(query) {
 			var self = this;
 			var matches = this.find(query);
-			console.log("matches "+matches);
 			if(this.isArray(matches)) {
 				matches.map(function(obj) {
 					return delete obj;
@@ -79,8 +78,6 @@
 		},
 
 		get : function(param){
-			console.log(param+ " params");
-			console.log(typeof param=="number");
 			if(typeof param == "number") {
 				if(param < this.OBJECTSTORE.length) return this.OBJECTSTORE[param];
 				else {
@@ -96,9 +93,9 @@
 			If all the properties match, return the objects list
 		 */
 		find : function(object){
-			if(!object) return RasDB(this.OBJECTSTORE);
+			if(!object) return new RasDB(this.OBJECTSTORE);
 			var keys = Object.keys(object);
-			return RasDB(this.OBJECTSTORE.filter(function(obj) {
+			return new RasDB(this.OBJECTSTORE.filter(function(obj) {
 				return keys.reduce(function(matching, key) {
 					if(obj[key]!=object[key]) matching = false;
 					return matching;
@@ -113,7 +110,7 @@
 		//TODO: Need to check the logic still
 		findOr : function(object){
 			var keys = Object.keys(object);
-			return RasDB(this.OBJECTSTORE.reduce(function(array, obj) {
+			return new RasDB(this.OBJECTSTORE.reduce(function(array, obj) {
 				keys.map(function(key) {
 					if(obj[key]==object[key]) {
 						if(array.indexOf(obj)==-1) array.push(obj);
@@ -133,7 +130,7 @@
 
 		*/
 		findById : function(id){
-			return RasDB(this.OBJECTSTORE.reduce(function(obj) {
+			return new RasDB(this.OBJECTSTORE.map(function(obj) {
 				if(obj.id==id) return obj;
 			}))
 		},
@@ -148,15 +145,15 @@
 		},
 
 		limit : function(param) {
-			return RasDB(this.OBJECTSTORE.slice(0,param));
+			return new RasDB(this.OBJECTSTORE.slice(0,param));
 		},
 
 		skip: function(param) {
-			return RasDB(this.OBJECTSTORE.slice(param));
+			return new RasDB(this.OBJECTSTORE.slice(param));
 		},
 
 		range: function(from, to) {
-			return RasDB(this.OBJECTSTORE.slice(from,to));
+			return new RasDB(this.OBJECTSTORE.slice(from,to));
 		},
 
 		exec : function(callback) {
