@@ -130,6 +130,18 @@
 			})
 		},
 
+		limit : function(param) {
+			return this.OBJECTSTORE.slice(0,param);
+		},
+
+		skip: function(param) {
+			return this.OBJECTSTORE.slice(param);
+		},
+
+		range: function(from, to) {
+			return this.OBJECTSTORE.slice(from,to);
+		},
+
 		writeToLS : function() {
 			localStorage[this.namespace] = JSON.stringify(this.OBJECTSTORE);
 		},
