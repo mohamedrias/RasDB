@@ -134,6 +134,12 @@
 				if(obj.id==id) return obj;
 			}))
 		},
+		first: function() {
+			return new RasDB([this.OBJECTSTORE[0]]);
+		},
+		last: function() {
+			return new RasDB([this.OBJECTSTORE[this.OBJECTSTORE.length-1]]);
+		},
 		index : function(property) {
 			this.index = property;
 		},
@@ -143,7 +149,6 @@
 				this.CacheStore[obj[self.index]] = obj;
 			})
 		},
-
 		limit : function(param) {
 			return new RasDB(this.OBJECTSTORE.slice(0,param));
 		},

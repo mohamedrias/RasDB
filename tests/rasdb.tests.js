@@ -59,4 +59,11 @@ assert(RasDB && window.RasDB, "RasDB is available for developers to extend clien
 
 		console.log(originalObject);
 	})();
+	console.log(Students.first().get()[0]);
+	console.log(data[0]);
+	assert(Students.first().get()[0]==data[0], "first() provides the first element of the array");
+	console.log(Students.OBJECTSTORE);
+	console.log(Students.last());
+	console.log(data[data.length-1]);
+	assert(Students.last().get()[0]==data[data.length-1], "last() provides the last element of the array");
 })();
