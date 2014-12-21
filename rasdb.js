@@ -207,9 +207,20 @@
 			this.$R(this.OBJECTSTORE.slice(from,to));
 			return this;
 		},
-		sort: function() {
-			this.flag = true;
-			this.$R(this.OBJECTSTORE.sort());
+		sort: function(property) {
+			property = property ? property : "id";
+			var sortOrder = 1;
+			if(property[0] === "-") {
+				sortOrder = -1;
+				property = property.substr(1);
+			}
+			var array = this.get();
+			this.$R(array.sort(function (a,b) {
+				var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+				return result * sortOrder;
+			}));
+
+
 			return this;
 		},
 
