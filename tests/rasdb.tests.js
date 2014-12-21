@@ -71,4 +71,14 @@ assert(RasDB && window.RasDB, "RasDB is available for developers to extend clien
 	assert(Students.get().length===data.length, "After deletion of objects, even the original object must be deleted")
 */
 	assert(Students.findById(0).get(0)===data[1], "Both the wrapped object and original object are same");
+
+	var paginate = Students.paginate();
+	assert(typeof paginate.next =="function", "Pagination provides next function");
+	assert(typeof paginate.prev =="function", "Pagination provides prev function");
+	assert(paginate.next().length==10, "Pagination provides next set of elements");
+	assert(paginate.prev().length==10, "Pagination provides prev set of elements");
+	paginate.prev();
+	paginate.prev();
+	paginate.prev();
+	assert(paginate.prev()[0]==Students.OBJECTSTORE[0], "If the length of pagination goes below 0, it handles that exception")
 })();

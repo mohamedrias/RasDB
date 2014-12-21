@@ -99,6 +99,7 @@
 		},
 
 		get : function(param){
+			var self = this;
 			if(typeof param == "number") {
 				if(param < this.OBJECTSTORE.length && !this.flag) return this.OBJECTSTORE[param];
 				if(param < this.results.length && this.flag) return this.results[param];
@@ -107,6 +108,9 @@
 					return;
 				}
 			}
+			setTimeout(function() {
+				self.flag = false;
+			}, 10);
 			return (!this.flag ? this.OBJECTSTORE : this.results);
 		},
 
@@ -212,6 +216,29 @@
 		exec : function(callback) {
 			if(callback && typeof callback =="function") {
 				return callback.apply(this, this.get());
+			}
+		},
+
+		paginate: function(numberOfResults) {
+			var numberOfResults = numberOfResults || 10,
+			from = 0,
+			to = 0,
+			results = new RasDB(this.OBJECTSTORE),
+			self =  this;
+			return {
+				next : function () {
+					from = to;
+					to = to + numberOfResults;
+					if(to > results.length) {
+						to = results.length -1;
+					}
+					if(to <= results.OBJECTSTORE.length)	return results.range(from,to).get();
+				},
+				prev : function() {
+					from = (from - numberOfResults < 0) ? 0 : (from - numberOfResults);
+					to = (to - numberOfResults < 0) ? 0 : numberOfResults;
+					return results.range(from, to).get();
+				}
 			}
 		},
 
