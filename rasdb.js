@@ -20,9 +20,6 @@
 		if(this.namespace) {
 			this.OBJECTSTORE = this.readFromLS();
 		}
-//		this.cache = configObject.cache || false;
-//		this.index = configObject.index || false;
-//		return this;
 	}
 	RasDB.prototype = {
 
@@ -154,15 +151,12 @@
 			return this;
 		},
 
-		/*
-		//TODO: Logic to fix find by single property & value
 		findBy : function(property, value){
-			return this.OBJECTSTORE.filter(function(obj) {
+			return this.$R(this.OBJECTSTORE.filter(function(obj) {
 				return (obj[property]==value);
-			})
+			}));
 		},
 
-		*/
 		findById : function(id){
 			var self = this;
 			this.flag = true;

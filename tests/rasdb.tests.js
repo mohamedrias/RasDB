@@ -82,4 +82,5 @@ assert(RasDB && window.RasDB, "RasDB is available for developers to extend clien
 	paginate.prev();
 	assert(paginate.prev()[0]==Students.OBJECTSTORE[0], "If the length of pagination goes below 0, it handles that exception")
 	assert(Students.sort("id").get()[0]===data[1], "Sort array using a given property");
+
 })();
