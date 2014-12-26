@@ -38,7 +38,7 @@ assert(RasDB && window.RasDB, "RasDB is available for developers to extend clien
 
 (function() {
 	var data = setup();
-	Students = new RasDB(data);
+	Students = new RasDB(data, "Students");
 	assert(Students instanceof RasDB, "Students is an instance of RasDB");
 	assert(Students.get().length===data.length, "Get() returns list of objects in an array");
 	assert(Students.find() instanceof RasDB, "Find with empty params must return RasDB instance");

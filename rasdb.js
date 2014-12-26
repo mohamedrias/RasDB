@@ -2,29 +2,34 @@
 	/*
 		Constructor function to initialize the RAS DB object.
 	 */
-	window.RasDB = function(configObject) {
+	window.RasDB = function(objects, namespace, newdb) {
 		if(!(this instanceof RasDB)) {
-			return new RasDB(configObject);
+			return new RasDB(objects);
 		}
-		this.results = [];
-		this.flag = false;
-		if({}.toString.call(configObject)=="[object Array]") {
-			this.OBJECTSTORE = configObject;
+		this.namespace = namespace;
+		if({}.toString.call(objects)=="[object Array]") {
+			console.log(this.namespace);
+			if(newdb) {
+				this.OBJECTSTORE = RasDB.prototype.$ObjectStore[namespace] || objects;
+			} else {
+				this.OBJECTSTORE = objects;
+				RasDB.prototype.$addToStores(namespace, objects);
+			}
+			this.results = objects;
 			return this;
 		}
-		if(configObject instanceof RasDB) return configObject;
-		this.configObject = configObject;
+		if(objects instanceof RasDB) return objects;
 		this.OBJECTSTORE = [];
-		this.namespace = this.configObject && this.configObject.namespace;
-		//TODO: Get localstorage namespace from configObject
-		if(this.namespace) {
-			this.OBJECTSTORE = this.readFromLS();
-		}
+		this.results = [];
 	}
 	RasDB.prototype = {
+		$ObjectStore : {},
+		$addToStores : function(namespace, objects) {
+			RasDB.prototype.$ObjectStore[namespace] = objects;
+		},
 
 		$R : function(array) {
-			this.results = array;
+			return new RasDB(array, this.namespace, true);
 		},
 		/*
 			method: dump
@@ -54,7 +59,6 @@
 		},
 
 		add : function(object) {
-			this.flag = false;
 			this.OBJECTSTORE.push(object);
 			this.writeToLS();
 			return this;
@@ -62,7 +66,6 @@
 
 		//TODO: Need to update logic for delete functionality
 		delete : function(query) {
-			this.flag = false;
 			var self = this;
 			if(typeof query ==="undefined") {
 				delete this.OBJECTSTORE;
@@ -86,29 +89,24 @@
 			return Object.prototype.toString.call(obj)==="[object Array]";
 		},
 		update : function(query, object){
-			this.flag = false;
 			this.find(query)[0]=object;
 			return this;
 		},
 
 		getAll: function() {
-			return this.OBJECTSTORE;
+			return this.results;
 		},
 
 		get : function(param){
 			var self = this;
 			if(typeof param == "number") {
-				if(param < this.OBJECTSTORE.length && !this.flag) return this.OBJECTSTORE[param];
-				if(param < this.results.length && this.flag) return this.results[param];
+				if(param < this.results.length) return this.results[param];
 				else {
 					console.warn("Sorry, index out of bound");
 					return;
 				}
 			}
-			setTimeout(function() {
-				self.flag = false;
-			}, 10);
-			return (!this.flag ? this.OBJECTSTORE : this.results);
+			return this.results;
 		},
 
 		/*
@@ -117,18 +115,15 @@
 		 */
 		find : function(object){
 			if(typeof object ==="undefined") {
-				this.flag = false;
 				return this;
 			};
-			this.flag = true;
 			var keys = Object.keys(object);
-			this.$R(this.OBJECTSTORE.filter(function(obj) {
+			return this.$R(this.OBJECTSTORE.filter(function(obj) {
 				return keys.reduce(function(matching, key) {
 					if(obj[key]!=object[key]) matching = false;
 					return matching;
 				}, true);
 			}));
-			return this;
 		},
 
 
@@ -138,7 +133,6 @@
 		 */
 		//TODO: Need to check the logic still
 		findOr : function(object){
-			this.flag = true;
 			var keys = Object.keys(object);
 			this.$R(this.OBJECTSTORE.reduce(function(array, obj) {
 				keys.map(function(key) {
@@ -148,7 +142,6 @@
 				});
 				return array;
 			}, []));
-			return this;
 		},
 
 		findBy : function(property, value){
@@ -159,24 +152,15 @@
 
 		findById : function(id){
 			var self = this;
-			this.flag = true;
-			this.$R(this.OBJECTSTORE.filter(function(obj) {
+			return this.$R(this.OBJECTSTORE.filter(function(obj) {
 				if(obj.id==id) return obj;
 			}));
-			return this;
 		},
 		first: function() {
-			this.flag = true;
-			this.$R([this.OBJECTSTORE[0]]);
-			return this;
+			return this.$R([this.results[0]]);
 		},
 		last: function() {
-			this.flag = true;
-			this.$R([this.OBJECTSTORE[this.OBJECTSTORE.length-1]]);
-			return this;
-		},
-		index : function(property) {
-			this.index = property;
+			return this.$R([this.results[this.results.length-1]]);
 		},
 		cache: function() {
 			var self = this;
@@ -185,21 +169,15 @@
 			})
 		},
 		limit : function(param) {
-			this.flag = true;
-			this.$R(this.OBJECTSTORE.slice(0,param));
-			return this;
+			return this.$R(this.results.slice(0,param));
 		},
 
 		skip: function(param) {
-			this.flag = true;
-			this.$R(this.OBJECTSTORE.slice(param));
-			return this;
+			return this.$R(this.results.slice(param));
 		},
 
 		range: function(from, to) {
-			this.flag = true;
-			this.$R(this.OBJECTSTORE.slice(from,to));
-			return this;
+			return this.$R(this.results.slice(from,to));
 		},
 		sort: function(property) {
 			property = property ? property : "id";
@@ -208,14 +186,11 @@
 				sortOrder = -1;
 				property = property.substr(1);
 			}
-			var array = this.get();
-			this.$R(array.sort(function (a,b) {
+			var array = this.results;
+			return this.$R(array.sort(function (a,b) {
 				var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
 				return result * sortOrder;
 			}));
-
-
-			return this;
 		},
 
 		exec : function(callback) {
@@ -228,7 +203,7 @@
 			var numberOfResults = numberOfResults || 10,
 			from = 0,
 			to = 0,
-			results = new RasDB(this.OBJECTSTORE),
+			results = this.$R(this.results),
 			self =  this;
 			return {
 				next : function () {
@@ -237,7 +212,7 @@
 					if(to > results.length) {
 						to = results.length -1;
 					}
-					if(to <= results.OBJECTSTORE.length)	return results.range(from,to).get();
+					if(to <= results.results.length)	return results.range(from,to).get();
 				},
 				prev : function() {
 					from = (from - numberOfResults < 0) ? 0 : (from - numberOfResults);
