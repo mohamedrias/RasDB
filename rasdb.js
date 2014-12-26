@@ -207,16 +207,15 @@
 			self =  this;
 			return {
 				next : function () {
+					if(to === results.results.length-1) return results.range(from,to).get();
 					from = to;
-					to = to + numberOfResults;
-					if(to > results.length) {
-						to = results.length -1;
-					}
+					to = (to + numberOfResults) > results.results.length ? (results.results.length -1) : (to + numberOfResults);
 					if(to <= results.results.length)	return results.range(from,to).get();
 				},
 				prev : function() {
-					from = (from - numberOfResults < 0) ? 0 : (from - numberOfResults);
-					to = (to - numberOfResults < 0) ? 0 : numberOfResults;
+					to = from;
+					from = ((from - numberOfResults) < 0) ? 0 : (from - numberOfResults);
+					to = (to <= 0) ? numberOfResults : to;
 					return results.range(from, to).get();
 				}
 			}
