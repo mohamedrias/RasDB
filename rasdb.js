@@ -65,25 +65,26 @@
 		},
 
 		//TODO: Need to update logic for delete functionality
-		delete : function(query) {
+		delete : function(query, flag) {
 			var self = this;
-			if(typeof query ==="undefined") {
-				delete this.OBJECTSTORE;
+			if(typeof query ==="boolean" && query) {
+				this.results.map(function(data) {
+					self.OBJECTSTORE.splice(self.OBJECTSTORE.indexOf(data),1);
+				});
 			}
-			else if (typeof query === "object") {
+			else if ((typeof query === "boolean" && !query) || !query) {
+				this.results.map(function(data) {
+					self.results.splice(self.results.indexOf(data),1);
+				});
+			}
+			/*else if(typeof query === "object") {
 				var matches = this.find(query).get();
 				if(this.isArray(matches)) {
 					matches.map(function(obj) {
-						return delete obj;
+						self.results.splice(self.OBJECTSTORE.indexOf(data),1);
 					})
 				}
-				else {
-					self.OBJECTSTORE.splice(self.OBJECTSTORE.indexOf(matches[0]),1);
-				}
-			}
-			else if(typeof query === "boolean") {
-				console.log("inside boolean");
-			}
+			} */
 		},
 		isArray : function(obj) {
 			return Object.prototype.toString.call(obj)==="[object Array]";
@@ -186,7 +187,8 @@
 				sortOrder = -1;
 				property = property.substr(1);
 			}
-			var array = this.results;
+			var array = this.results.slice(0);
+			console.log(this);
 			return this.$R(array.sort(function (a,b) {
 				var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
 				return result * sortOrder;
