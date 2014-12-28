@@ -44,12 +44,8 @@
 				//TODO: Implement promise to have callback available.
 			}
 			if(data && typeof data === "object" && Object.prototype.toString.call(data) === "[object Array]") {
-				if(this.cache) {
-					data.map(function(obj) {
-						self.CacheStore[obj[self.index]] = obj;
-					})
-				}
 				this.OBJECTSTORE = data;
+				this.results = data;
 			}
 			if(data && typeof data === "object" && Object.prototype.toString.call(data) === "[object Object]") {
 				this.add(data);
@@ -60,6 +56,7 @@
 
 		add : function(object) {
 			this.OBJECTSTORE.push(object);
+			this.results.push(object);
 			this.writeToLS();
 			return this;
 		},
@@ -70,6 +67,7 @@
 			if(typeof query ==="boolean" && query) {
 				this.results.map(function(data) {
 					self.OBJECTSTORE.splice(self.OBJECTSTORE.indexOf(data),1);
+					self.results.splice(self.results.indexOf(data),1);
 				});
 			}
 			else if ((typeof query === "boolean" && !query) || !query) {
