@@ -13,18 +13,15 @@ function RasDB(namespace) {
 }
 RasDB.prototype = {
 	OBJECTSTORE : {},
-	createCollection : function(collectionName) {
-		return new Collection(this.namespace, collectionName);
-	},
 	collection : function(collectionName) {
 		return new Collection(this.namespace, collectionName);
 	}
 }
-function Collection(namespace, collectionName) {
+function Collection(databaseName, collectionName) {
 	this.collectionName = collectionName;
-	this.database = namespace;
-	RasDB.prototype.OBJECTSTORE[namespace][collectionName] = RasDB.prototype.OBJECTSTORE[namespace][collectionName] || [];
-	this.objects = RasDB.prototype.OBJECTSTORE[namespace][collectionName].slice(0);
+	this.database = databaseName;
+	RasDB.prototype.OBJECTSTORE[databaseName][collectionName] = RasDB.prototype.OBJECTSTORE[databaseName][collectionName] || [];
+	this.objects = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
 }
 
 Collection.prototype = {

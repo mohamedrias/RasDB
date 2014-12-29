@@ -27,7 +27,7 @@ var DB = new RasDB("TODOApp");
 assert("New instance of radDB is created", DB instanceof RasDB);
 assert("TODOApp namespace is created successfully", typeof DB.OBJECTSTORE[DB.namespace] == "object");
 
-var todo = DB.createCollection("todo");
+var todo = DB.collection("todo");
 assert("todo collection is created successfully", todo instanceof Collection);
 
 assert("todo collection with namespace is created inside the database", typeof DB.OBJECTSTORE[DB.namespace][todo.collectionName]=="object");
@@ -37,7 +37,7 @@ var UserDB = new RasDB("User");
 assert("New instance of radDB is created", UserDB instanceof RasDB);
 assert("TODOApp namespace is created successfully", typeof UserDB.OBJECTSTORE[UserDB.namespace] == "object");
 
-var userAccounts = UserDB.createCollection("accounts");
+var userAccounts = UserDB.collection("accounts");
 assert("todo collection is created successfully", userAccounts instanceof Collection);
 
 assert("todo collection with namespace is created inside the database", typeof UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName]=="object");
