@@ -41,3 +41,13 @@ var userAccounts = UserDB.collection("accounts");
 assert("todo collection is created successfully", userAccounts instanceof Collection);
 
 assert("todo collection with namespace is created inside the database", typeof UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName]=="object");
+
+var account = {
+	name : "Savings",
+	balance: 14000,
+	currency: "USD",
+	nickname : "My husbands saving's account"
+};
+userAccounts.insert(account);
+
+assert("New object can be added to the collection inside particular database", UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName][0]==account);
