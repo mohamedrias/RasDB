@@ -54,8 +54,10 @@ Collection.prototype = {
 		if(this.isArray(array)) {
 			if(replace) {
 				RasDB.prototype.OBJECTSTORE[this.database][this.collectionName] = array;
+				this.results = array.slice(0);
 			} else {
 				RasDB.prototype.OBJECTSTORE[this.database][this.collectionName] = RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].concat(array);
+				this.results = RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].slice(0);
 			}
 		}
 		return this;

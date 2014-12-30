@@ -43,6 +43,7 @@ assert("todo collection is created successfully", userAccounts instanceof Collec
 assert("todo collection with namespace is created inside the database", typeof UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName]=="object");
 
 var account = {
+	accountNumber : "123",
 	name : "Savings",
 	balance: 14000,
 	currency: "USD",
@@ -51,3 +52,31 @@ var account = {
 userAccounts.insert(account);
 
 assert("New object can be added to the collection inside particular database", UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName][0]==account);
+
+var accounts = [{
+	accountNumber: "234",
+	name : "Savings",
+	balance: 13000,
+	currency: "USD",
+	nickname : "Niel's Account"
+},{
+	accountNumber: "454",
+	name : "Current",
+	balance: 1000,
+	currency: "USD",
+	nickname : "Rias's Account"
+},{
+	accountNumber: "3434",
+	name : "ISA",
+	balance: 3000,
+	currency: "USD",
+	nickname : "Rekha's Account"
+}];
+
+userAccounts.dump(accounts);
+
+assert("Dumping an array of objects adds the objects to existing ObjectStore", UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName].length==4);
+
+userAccounts.dump(accounts, true);
+
+assert("Dumping an array with reset flag set will replace existing objectStore", UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName].length==3);
