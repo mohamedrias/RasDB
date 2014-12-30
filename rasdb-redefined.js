@@ -31,7 +31,7 @@ function Collection(databaseName, collectionName, results) {
 
 Collection.prototype = {
 	$R : function(results) {
-		return new Collection(this.database, this.collectionName, results);
+		return results ? new Collection(this.database, this.collectionName, results) : new Collection(this.database, this.collectionName) ;
 	},
 	isArray : function(obj) {
 		return Object.prototype.toString.call(obj)==="[object Array]";
