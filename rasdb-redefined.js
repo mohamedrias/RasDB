@@ -17,17 +17,23 @@ RasDB.prototype = {
 		return new Collection(this.namespace, collectionName);
 	}
 }
-function Collection(databaseName, collectionName) {
+function Collection(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
 	RasDB.prototype.OBJECTSTORE[databaseName][collectionName] = RasDB.prototype.OBJECTSTORE[databaseName][collectionName] || [];
-	this.objects = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
+	if(results && {}.prototype.toString.call(results)==="[object Array]") {
+		this.results = results;
+	} else {
+		this.results = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
+	}
+
 }
 
 Collection.prototype = {
 	insert : function(object) {
 		if(object && typeof object =="object") {
 			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].push(object);
+			this.results.push(object);
 		}
 		return this;
 	},
@@ -40,5 +46,21 @@ Collection.prototype = {
 			}
 		}
 		return this;
+	},
+
+	getAll: function() {
+		return this.results;
+	},
+
+	get : function(param){
+		var self = this;
+		if(typeof param == "number") {
+			if(param < this.results.length) return this.results[param];
+			else {
+				console.warn("Sorry, index out of bound");
+				return;
+			}
+		}
+		return this.results;
 	}
 }
