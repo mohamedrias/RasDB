@@ -33,6 +33,12 @@ Collection.prototype = {
 	$R : function(results) {
 		return new Collection(this.database, this.collectionName, results);
 	},
+	isArray : function(obj) {
+		return Object.prototype.toString.call(obj)==="[object Array]";
+	},
+	isObject : function(object) {
+		return object && typeof object =="object"
+	},
 	insert : function(object) {
 		if(this.isObject(object)) {
 			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].push(object);
@@ -70,10 +76,20 @@ Collection.prototype = {
 		}
 		return this.results;
 	},
-	isArray : function(obj) {
-		return Object.prototype.toString.call(obj)==="[object Array]";
-	},
-	isObject : function(object) {
-		return object && typeof object =="object"
+	/*
+	 Used to match multiple properties of an object.
+	 If all the properties match, return the objects list
+	 */
+	find : function(object){
+		if(typeof object ==="undefined") {
+			return this;
+		};
+		var keys = Object.keys(object);
+		return this.$R(this.results.filter(function(obj) {
+			return keys.reduce(function(matching, key) {
+				if(obj[key]!=object[key]) matching = false;
+				return matching;
+			}, true);
+		}));
 	}
 }
