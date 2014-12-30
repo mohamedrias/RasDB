@@ -30,6 +30,9 @@ function Collection(databaseName, collectionName, results) {
 }
 
 Collection.prototype = {
+	$R : function(results) {
+		return new Collection(this.database, this.collectionName, results);
+	},
 	insert : function(object) {
 		if(object && typeof object =="object") {
 			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].push(object);
