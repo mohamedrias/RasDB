@@ -21,7 +21,7 @@ function Collection(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
 	RasDB.prototype.OBJECTSTORE[databaseName][collectionName] = RasDB.prototype.OBJECTSTORE[databaseName][collectionName] || [];
-	if(results && {}.prototype.toString.call(results)==="[object Array]") {
+	if(results && this.prototype.isArray(results)) {
 		this.results = results;
 	} else {
 		this.results = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
@@ -34,14 +34,18 @@ Collection.prototype = {
 		return new Collection(this.database, this.collectionName, results);
 	},
 	insert : function(object) {
-		if(object && typeof object =="object") {
+		if(this.isObject(object)) {
 			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].push(object);
 			this.results.push(object);
+		}
+		if(this.isArray(object)) {
+			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].concat(object);
+			this.results.concat(object);
 		}
 		return this;
 	},
 	dump : function(array, replace) {
-		if({}.prototype.toString.call(array)==="[object Array]") {
+		if(this.isArray(array)) {
 			if(replace) {
 				RasDB.prototype.OBJECTSTORE[this.database][this.collectionName] = array;
 			} else {
@@ -68,5 +72,8 @@ Collection.prototype = {
 	},
 	isArray : function(obj) {
 		return Object.prototype.toString.call(obj)==="[object Array]";
+	},
+	isObject : function(object) {
+		return object && typeof object =="object"
 	}
 }
