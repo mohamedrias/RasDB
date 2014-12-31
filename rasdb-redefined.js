@@ -21,7 +21,7 @@ function Collection(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
 	RasDB.prototype.OBJECTSTORE[databaseName][collectionName] = RasDB.prototype.OBJECTSTORE[databaseName][collectionName] || [];
-	if(results && this.prototype.isArray(results)) {
+	if(results && Collection.prototype.isArray(results)) {
 		this.results = results;
 	} else {
 		this.results = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
@@ -93,5 +93,11 @@ Collection.prototype = {
 				return matching;
 			}, true);
 		}));
+	},
+
+	findBy : function(property, value){
+		return this.$R(this.results.filter(function(obj) {
+				return (obj[property]==value);
+			}));
 	}
 }

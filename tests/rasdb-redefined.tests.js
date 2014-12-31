@@ -80,3 +80,11 @@ assert("Dumping an array of objects adds the objects to existing ObjectStore", U
 userAccounts.dump(accounts, true);
 
 assert("Dumping an array with reset flag set will replace existing objectStore", UserDB.OBJECTSTORE[UserDB.namespace][userAccounts.collectionName].length==3);
+
+var nameISA = userAccounts.find({"name": "ISA"}).get();
+
+assert("find method is useful to filter objects based on object being passed", nameISA[0].name=="ISA");
+
+var elementsByName = userAccounts.findBy("name","ISA").get();
+
+assert("findBy method is useful to find a property value in object", elementsByName[0].name=="ISA");
