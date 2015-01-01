@@ -1,3 +1,5 @@
+(function() {
+"use strict";
 /**
  * User: Rias
  * Date: 12/29/14
@@ -5,26 +7,27 @@
  * Description : Description will be here
  * File name : rasdb-redefined
  */
+var OBJECTSTORE = {};
 
-function RasDB(namespace) {
+window.RasDB = function(namespace) {
 	this.namespace = namespace;
-	RasDB.prototype.OBJECTSTORE[namespace] = RasDB.prototype.OBJECTSTORE[namespace] || {};
+	OBJECTSTORE[namespace] = OBJECTSTORE[namespace] || {};
 	return this;
 }
 RasDB.prototype = {
-	OBJECTSTORE : {},
+	OBJECTSTORE : OBJECTSTORE,
 	collection : function(collectionName) {
 		return new Collection(this.namespace, collectionName);
 	}
 }
-function Collection(databaseName, collectionName, results) {
+window.Collection = function(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
-	RasDB.prototype.OBJECTSTORE[databaseName][collectionName] = RasDB.prototype.OBJECTSTORE[databaseName][collectionName] || [];
+	OBJECTSTORE[databaseName][collectionName] = OBJECTSTORE[databaseName][collectionName] || [];
 	if(results && Collection.prototype.isArray(results)) {
 		this.results = results;
 	} else {
-		this.results = RasDB.prototype.OBJECTSTORE[databaseName][collectionName].slice(0);
+		this.results = OBJECTSTORE[databaseName][collectionName].slice(0);
 	}
 
 }
@@ -41,11 +44,11 @@ Collection.prototype = {
 	},
 	insert : function(object) {
 		if(this.isObject(object)) {
-			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].push(object);
+			OBJECTSTORE[this.database][this.collectionName].push(object);
 			this.results.push(object);
 		}
 		if(this.isArray(object)) {
-			RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].concat(object);
+			OBJECTSTORE[this.database][this.collectionName].concat(object);
 			this.results.concat(object);
 		}
 		return this;
@@ -53,11 +56,11 @@ Collection.prototype = {
 	dump : function(array, replace) {
 		if(this.isArray(array)) {
 			if(replace) {
-				RasDB.prototype.OBJECTSTORE[this.database][this.collectionName] = array;
+				OBJECTSTORE[this.database][this.collectionName] = array;
 				this.results = array.slice(0);
 			} else {
-				RasDB.prototype.OBJECTSTORE[this.database][this.collectionName] = RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].concat(array);
-				this.results = RasDB.prototype.OBJECTSTORE[this.database][this.collectionName].slice(0);
+				OBJECTSTORE[this.database][this.collectionName] = OBJECTSTORE[this.database][this.collectionName].concat(array);
+				this.results = OBJECTSTORE[this.database][this.collectionName].slice(0);
 			}
 		}
 		return this;
@@ -99,5 +102,12 @@ Collection.prototype = {
 		return this.$R(this.results.filter(function(obj) {
 				return (obj[property]==value);
 			}));
+	},
+	first: function() {
+		return this.$R(this.get()[0]);
+	},
+	last: function() {
+		return this.$R([this.results[this.results.length-1]]);
 	}
 }
+})();
