@@ -108,6 +108,17 @@ Collection.prototype = {
 	},
 	last: function() {
 		return this.$R([this.results[this.results.length-1]]);
+	},
+	limit : function(param) {
+		return this.$R(param ? this.results.slice(0,param) : this.results);
+	},
+
+	skip: function(param) {
+		return this.$R(this.results.slice(param));
+	},
+
+	range: function(from, to) {
+		return this.$R(this.results.slice(from,to));
 	}
 }
 })();
