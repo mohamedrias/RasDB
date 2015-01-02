@@ -132,6 +132,34 @@ Collection.prototype = {
 			var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
 			return result * sortOrder;
 		}));
+	},
+
+	exec : function(callback) {
+		if(callback && typeof callback =="function") {
+			return callback.apply(this, this.get());
+		}
+	},
+
+	paginate: function(numberOfResults) {
+		var numberOfResults = numberOfResults || 10,
+			from = 0,
+			to = 0,
+			results = this.$R(this.results),
+			self =  this;
+		return {
+			next : function () {
+				if(to === results.results.length-1) return results.range(from,to).get();
+				from = to;
+				to = (to + numberOfResults) > results.results.length ? (results.results.length -1) : (to + numberOfResults);
+				if(to <= results.results.length)	return results.range(from,to).get();
+			},
+			prev : function() {
+				to = from;
+				from = ((from - numberOfResults) < 0) ? 0 : (from - numberOfResults);
+				to = (to <= 0) ? numberOfResults : to;
+				return results.range(from, to).get();
+			}
+		}
 	}
 }
 })();
