@@ -119,6 +119,19 @@ Collection.prototype = {
 
 	range: function(from, to) {
 		return this.$R(this.results.slice(from,to));
+	},
+	sort: function(property) {
+		property = property ? property : "id";
+		var sortOrder = 1;
+		if(property[0] === "-") {
+			sortOrder = -1;
+			property = property.substr(1);
+		}
+		var array = this.results.slice(0);
+		return this.$R(array.sort(function (a,b) {
+			var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+			return result * sortOrder;
+		}));
 	}
 }
 })();
