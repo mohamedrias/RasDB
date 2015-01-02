@@ -148,7 +148,7 @@ Collection.prototype = {
 			self =  this;
 		return {
 			next : function () {
-				if(to === results.results.length-1) return results.range(from,to).get();
+				if(to === results.results.length) return results.range(from,to).get();
 				from = to;
 				to = (to + numberOfResults) > results.results.length ? (results.results.length -1) : (to + numberOfResults);
 				if(to <= results.results.length)	return results.range(from,to).get();
