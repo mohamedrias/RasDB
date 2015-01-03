@@ -85,17 +85,26 @@ Collection.prototype = {
 	 Used to match multiple properties of an object.
 	 If all the properties match, return the objects list
 	 */
-	find : function(object){
+	find : function(object, callback){
 		if(typeof object ==="undefined") {
 			return this;
 		};
 		var keys = Object.keys(object);
-		return this.$R(this.results.filter(function(obj) {
-			return keys.reduce(function(matching, key) {
-				if(obj[key]!=object[key]) matching = false;
-				return matching;
-			}, true);
-		}));
+		if(arguments.length==1) {
+			return this.$R(this.results.filter(function(obj) {
+				return keys.reduce(function(matching, key) {
+					if(obj[key]!=object[key]) matching = false;
+					return matching;
+				}, true);
+			}));
+		} else if(arguments.length>1) {
+			return callback.call(this, this.results.filter(function(obj) {
+				return keys.reduce(function(matching, key) {
+					if(obj[key]!=object[key]) matching = false;
+					return matching;
+				}, true);
+			}));
+		}
 	},
 
 	findBy : function(property, value){
