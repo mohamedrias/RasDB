@@ -7,41 +7,95 @@
  * Description : Description will be here
  * File name : rasdb-redefined
  */
-var OBJECTSTORE = {};
 
+/**
+ * Private Object Store accessible only for RasDB
+ * @type {{}}
+ */
+var OBJECTSTORE = {};
+/**
+ * RasDB Constructore function: creates a namespace for the DB in objectstore
+ * @param namespace
+ * @returns DB Object
+ */
 window.RasDB = function(namespace) {
 	this.namespace = namespace;
 	OBJECTSTORE[namespace] = OBJECTSTORE[namespace] || {};
 	return this;
 }
+	/**
+	 * Prototype Chain for RASDB object.
+	 * @description Exposes objectstore and collection API
+	 * @type {{OBJECTSTORE: {}, collection: Function}}
+	 */
 RasDB.prototype = {
 	OBJECTSTORE : OBJECTSTORE,
+	/**
+	 * Used to
+	 * @param collectionName
+	 * @returns {Collection}
+	 */
 	collection : function(collectionName) {
 		return new Collection(this.namespace, collectionName);
 	}
 }
-window.Collection = function(databaseName, collectionName, results) {
+
+	/**
+	 * Collection Constructore Function: Used to create new collection & Get existing collection
+	 * @param databaseName
+	 * @param collectionName
+	 * @param results
+	 * @constructor
+	 */
+	window.Collection = function(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
 	OBJECTSTORE[databaseName][collectionName] = OBJECTSTORE[databaseName][collectionName] || [];
 	if(results && Collection.prototype.isArray(results)) {
 		this.results = results;
 	} else {
-		this.results = OBJECTSTORE[databaseName][collectionName].slice(0);
+		this.results = Collection.prototype.getAll();
 	}
 
 }
 
+	/**
+	 * Prototype chain on Collection to do basic CRUD operations
+	 * @type {{$R: Function, isArray: Function, isObject: Function, insert: Function, dump: Function, getAll: Function, get: Function, find: Function, findBy: Function, first: Function, last: Function, limit: Function, skip: Function, range: Function, sort: Function, exec: Function, paginate: Function}}
+	 */
 Collection.prototype = {
+	/**
+	 * Function used to create new collection object for internal results purpose
+	 * @param results
+	 * @returns {Collection}
+	 */
 	$R : function(results) {
 		return results ? new Collection(this.database, this.collectionName, results) : new Collection(this.database, this.collectionName) ;
 	},
-	isArray : function(obj) {
-		return Object.prototype.toString.call(obj)==="[object Array]";
+
+	/**
+	 * Checks whether a given object is Array or not
+	 * @param object
+	 * @returns {boolean}
+	 */
+	isArray : function(object) {
+		return Object.prototype.toString.call(object)==="[object Array]";
 	},
+
+	/**
+	 * Check if a given object is really an object || null
+	 * @param object
+	 * @returns {*|boolean}
+	 */
 	isObject : function(object) {
 		return object && typeof object =="object"
 	},
+
+	/**
+	 * Function used to insert object into the objectstore. Checks whether the input is an object/array.
+	 * @param object
+	 * @returns {*}
+	 */
 	insert : function(object) {
 		if(this.isObject(object)) {
 			OBJECTSTORE[this.database][this.collectionName].push(object);
@@ -53,6 +107,13 @@ Collection.prototype = {
 		}
 		return this;
 	},
+
+	/**
+	 * Function used to dump an array of objects into the Objectstore.
+	 * @param array
+	 * @param replace : Boolean flag used to specify whether to replace the ObjectStore / append to the ObjectStore
+	 * @returns {*}
+	 */
 	dump : function(array, replace) {
 		if(this.isArray(array)) {
 			if(replace) {
@@ -66,10 +127,19 @@ Collection.prototype = {
 		return this;
 	},
 
+	/**
+	 * Function returns the Collection array
+	 * @returns {*} : Returns the collection results arrays
+	 */
 	getAll: function() {
-		return this.results;
+		return OBJECTSTORE[this.database][this.collectionName].slice(0);
 	},
 
+	/**
+	 * Function used to get the results from objectstore either based on index
+	 * @param param: Optional input. Used to get object from specific index
+	 * @returns {*}
+	 */
 	get : function(param){
 		var self = this;
 		if(typeof param == "number") {
