@@ -7,20 +7,47 @@
  * Description : Description will be here
  * File name : rasdb-redefined
  */
-var OBJECTSTORE = {};
 
+/**
+ * Private Object Store accessible only for RasDB
+ * @type {{}}
+ */
+var OBJECTSTORE = {};
+/**
+ * RasDB Constructore function: creates a namespace for the DB in objectstore
+ * @param namespace
+ * @returns DB Object
+ */
 window.RasDB = function(namespace) {
 	this.namespace = namespace;
 	OBJECTSTORE[namespace] = OBJECTSTORE[namespace] || {};
 	return this;
 }
+	/**
+	 * Prototype Chain for RASDB object.
+	 * @description Exposes objectstore and collection API
+	 * @type {{OBJECTSTORE: {}, collection: Function}}
+	 */
 RasDB.prototype = {
 	OBJECTSTORE : OBJECTSTORE,
+	/**
+	 * Used to
+	 * @param collectionName
+	 * @returns {Collection}
+	 */
 	collection : function(collectionName) {
 		return new Collection(this.namespace, collectionName);
 	}
 }
-window.Collection = function(databaseName, collectionName, results) {
+
+	/**
+	 * Collection Constructore Function: Used to create new collection & Get existing collection
+	 * @param databaseName
+	 * @param collectionName
+	 * @param results
+	 * @constructor
+	 */
+	window.Collection = function(databaseName, collectionName, results) {
 	this.collectionName = collectionName;
 	this.database = databaseName;
 	OBJECTSTORE[databaseName][collectionName] = OBJECTSTORE[databaseName][collectionName] || [];
