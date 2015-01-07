@@ -177,28 +177,61 @@ Collection.prototype = {
 		}
 	},
 
+	/**
+	 * Used to find by a particular property
+	 * @param property
+	 * @param value
+	 * @returns {Collection}
+	 */
 	findBy : function(property, value){
 		return this.$R(this.results.filter(function(obj) {
 				return (obj[property]==value);
 			}));
 	},
+	/**
+	 * Function to get the first position object
+	 * @returns {Collection}
+	 */
 	first: function() {
 		return this.$R(this.get()[0]);
 	},
+	/**
+	 * Used to return the last element from the objectstore
+	 * @returns {Collection}
+	 */
 	last: function() {
 		return this.$R([this.results[this.results.length-1]]);
 	},
+	/**
+	 * Used to limit the number of results
+	 * @param param
+	 * @returns {Collection}
+	 */
 	limit : function(param) {
 		return this.$R(param ? this.results.slice(0,param) : this.results);
 	},
-
+	/**
+	 * Used to skip particular element from the array
+	 * @param param
+	 * @returns {Collection}
+	 */
 	skip: function(param) {
 		return this.$R(this.results.slice(param));
 	},
-
+	/**
+	 * Used to cherry pick particular range of elements from the objectstore
+	 * @param from
+	 * @param to
+	 * @returns {Collection}
+	 */
 	range: function(from, to) {
 		return this.$R(this.results.slice(from,to));
 	},
+	/**
+	 * Used to sort the results via different parameters
+	 * @param property to sort the array. use "-" as prefix if reverse sorting is required
+	 * @returns {Collection}
+	 */
 	sort: function(property) {
 		property = property ? property : "id";
 		var sortOrder = 1;
@@ -212,13 +245,21 @@ Collection.prototype = {
 			return result * sortOrder;
 		}));
 	},
-
+	/**
+	 * Gives control the user after the query has executed.
+	 * @param callback
+	 * @returns {*}
+	 */
 	exec : function(callback) {
 		if(callback && typeof callback =="function") {
 			return callback.apply(this, this.get());
 		}
 	},
-
+	/**
+	 * Provides pagination functionality to the objectstore
+	 * @param numberOfResults
+	 * @returns {{next: Function, prev: Function}}
+	 */
 	paginate: function(numberOfResults) {
 		var numberOfResults = numberOfResults || 10,
 			from = 0,
